@@ -53,13 +53,23 @@ class OperatorsListComponent extends StatefulWidget {
 }
 
 class _OperatorsListComponentState extends State<OperatorsListComponent> {
-  // State to track the selected consultant
   int _selectedConsultantIndex = 0;
 
-  void _onConsultantSelected(int index) {
+  @override
+  void initState() {
+    super.initState();
+
+    GlobalVariables.operatorId = widget.operators[0].id;
+    GlobalVariables.operatorName =
+        '${widget.operators[0].user.name} ${widget.operators[0].user.surname}';
+  }
+
+  void _onOperatorSelected(int index) {
     setState(() {
       _selectedConsultantIndex = index;
       GlobalVariables.operatorId = widget.operators[index].id;
+      GlobalVariables.operatorName =
+          '${widget.operators[index].user.name} ${widget.operators[index].user.surname}';
     });
   }
 
@@ -72,7 +82,7 @@ class _OperatorsListComponentState extends State<OperatorsListComponent> {
           value: index,
           groupValue: _selectedConsultantIndex,
           onChanged: (int? value) {
-            _onConsultantSelected(value!); // Corrected callback method
+            _onOperatorSelected(value!); // Corrected callback method
           },
           title: Text(
               '${widget.operators[index].user.name} ${widget.operators[index].user.surname}'),

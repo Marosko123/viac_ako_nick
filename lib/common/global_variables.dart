@@ -11,6 +11,7 @@ class GlobalVariables {
   static bool isUserLoggedIn = false;
   static String token = '';
   static int operatorId = 0;
+  static String operatorName = '';
   static User user = User();
   static String phone = '';
   static String question = '';

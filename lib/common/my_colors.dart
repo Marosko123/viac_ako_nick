@@ -10,6 +10,7 @@ class MyColors {
   static late Color dividerColor;
   static late Color buttonTextColor;
   static late Color buttonColor;
+  static late Color chatInputColor;
   static late Color startChatButtonColor;
   static late Color textFieldFillColor;
   static late Color textFieldHintColor;
@@ -30,6 +31,7 @@ class MyColors {
     "divider": Color.fromARGB(255, 158, 158, 158),
     "buttonText": Color.fromARGB(255, 255, 255, 255),
     "button": Color.fromARGB(255, 180, 73, 73),
+    "chatInput": Color.fromARGB(255, 28, 28, 36),
     "startChatButtonColor": Color.fromARGB(255, 12, 192, 224),
     "textFieldFill": Color.fromARGB(255, 238, 238, 238),
     "textFieldHint": Color.fromARGB(255, 158, 158, 158),
@@ -53,6 +55,7 @@ class MyColors {
     "divider": Color.fromARGB(255, 255, 255, 255),
     "buttonText": Color.fromARGB(255, 0, 0, 0),
     "button": Color.fromARGB(255, 255, 255, 255),
+    "chatInput": Color.fromARGB(255, 28, 34, 28),
     "startChatButtonColor": Color.fromARGB(255, 0, 153, 180),
     "textFieldFill": Color.fromARGB(255, 112, 112, 112),
     "textFieldHint": Color.fromARGB(255, 241, 241, 241),
@@ -77,6 +80,7 @@ class MyColors {
     MyColors.dividerColor = colors["divider"]!;
     MyColors.buttonTextColor = colors["buttonText"]!;
     MyColors.buttonColor = colors["button"]!;
+    MyColors.chatInputColor = colors["chatInput"]!;
     MyColors.startChatButtonColor = colors["startChatButtonColor"]!;
     MyColors.textFieldFillColor = colors["textFieldFill"]!;
     MyColors.textFieldHintColor = colors["textFieldHint"]!;
