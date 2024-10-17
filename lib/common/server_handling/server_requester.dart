@@ -69,6 +69,12 @@ class ServerRequester {
           );
           break;
         case 'PUT':
+          response = await http.put(
+            Uri.parse(fullRoute),
+            headers: headers,
+            body: body,
+          );
+          break;
         case 'PATCH':
           response = await http.patch(
             Uri.parse(fullRoute),

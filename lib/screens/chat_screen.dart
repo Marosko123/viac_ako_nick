@@ -73,8 +73,12 @@ class _ChatScreenState extends State<ChatScreen>
           "user_id": 0,
         }
       ]
-    }).then((value) async {
-      await _fetchMessages();
+    }).then((value) {
+      RequestHandler.setChatOperatorId(
+        GlobalVariables.chatId,
+        GlobalVariables.operatorId,
+      );
+      return value;
     });
 
     _startFetchingMessages();
@@ -172,29 +176,29 @@ class _ChatScreenState extends State<ChatScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: FutureBuilder<chat_model.Chat?>(
-          future: futureChatRoom,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else if (snapshot.hasData && snapshot.data != null) {
-              // When the data is available, show the chat interface
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      const MyButton(
-                        text: 'Rýchlo preč!',
-                        onTap: null,
-                      ),
-                      Expanded(
-                        child: Chat(
+        body: Column(
+          children: [
+            const MyButton(
+              text: "Rýchlo preč",
+              onTap: null,
+            ),
+            Expanded(
+              child: FutureBuilder<chat_model.Chat?>(
+                future: futureChatRoom,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    // When the data is available, show the chat interface
+                    return Stack(
+                      children: [
+                        Chat(
                           messages: _messages,
                           onAttachmentPressed: _handleAttachmentPressed,
                           onSendPressed: _handleSendPressed,
@@ -210,73 +214,76 @@ class _ChatScreenState extends State<ChatScreen>
                             user: const types.User(id: '0'),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  // Quick Messages Container
-                  if (_showQuickMessages)
-                    Positioned(
-                      top: 90, // Adjust the position above the FAB
-                      right: 20,
-                      child: FadeTransition(
-                        opacity: _animation,
-                        child: ScaleTransition(
-                          scale: _animation,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              FloatingActionButton.extended(
-                                onPressed: () => _sendQuickMessage(
-                                    "Ako táto aplikácia funguje?"),
-                                label:
-                                    const Text("Ako táto aplikácia funguje?"),
-                              ),
-                              const SizedBox(height: 5),
-                              FloatingActionButton.extended(
-                                onPressed: () => _sendQuickMessage("Bojím sa."),
-                                label: const Text("Bojím sa."),
-                              ),
-                              const SizedBox(height: 5),
-                              FloatingActionButton.extended(
-                                onPressed: () =>
-                                    _sendQuickMessage("Ďakujem za pomoc."),
-                                label: const Text("Ďakujem za pomoc."),
-                              ),
-                              const SizedBox(height: 5),
-
-                              // Scrollable list of emojis, horizontally
-                              SizedBox(
-                                height: 200,
-                                width: 260,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: _generateEmojiButtons(
-                                      _sendQuickMessage,
+                        // Quick Messages Container
+                        if (_showQuickMessages)
+                          Positioned(
+                            top: 0, // Adjust the position above the FAB
+                            right: 20,
+                            child: FadeTransition(
+                              opacity: _animation,
+                              child: ScaleTransition(
+                                scale: _animation,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    FloatingActionButton.extended(
+                                      onPressed: () => _sendQuickMessage(
+                                          "Ako táto aplikácia funguje?"),
+                                      label: const Text(
+                                          "Ako táto aplikácia funguje?"),
                                     ),
-                                  ),
+                                    const SizedBox(height: 5),
+                                    FloatingActionButton.extended(
+                                      onPressed: () =>
+                                          _sendQuickMessage("Bojím sa."),
+                                      label: const Text("Bojím sa."),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    FloatingActionButton.extended(
+                                      onPressed: () => _sendQuickMessage(
+                                          "Ďakujem za pomoc."),
+                                      label: const Text("Ďakujem za pomoc."),
+                                    ),
+                                    const SizedBox(height: 5),
+
+                                    // Scrollable list of emojis, horizontally
+                                    SizedBox(
+                                      height: 200,
+                                      width: 260,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: _generateEmojiButtons(
+                                            _sendQuickMessage,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            } else {
-              // If no data is available or the future fails, show a fallback message
-              return const Center(
-                child: Text('Nepodarilo sa vytvoriť chat.'),
-              );
-            }
-          },
+                      ],
+                    );
+                  } else {
+                    // If no data is available or the future fails, show a fallback message
+                    return const Text(
+                      'Nepodarilo sa vytvoriť chat.',
+                      style: TextStyle(fontSize: 20),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _toggleQuickMessages,
-          child: const Icon(Icons.message),
+          child: const Icon(
+            Icons.message,
+          ),
         ),
-        // position location a little higher to avoid overlapping with the quick messages
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       );
 

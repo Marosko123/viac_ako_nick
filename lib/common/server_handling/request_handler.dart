@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
-
 import 'package:ViacAkoNick/common/global_variables.dart';
 import 'package:ViacAkoNick/common/server_handling/parsers.dart';
 import 'package:ViacAkoNick/common/server_handling/routes.dart';
@@ -116,13 +114,11 @@ class RequestHandler {
   }
 
   static Future<void> setChatOperatorId(int chatId, int operatorId) async {
-    print('Setting chat[$chatId] operator ID to "$operatorId"');
-
     final http.Response response = await ServerRequester.request(
       apiRoute: ApiRoutes.updateChat,
+      params: '/$chatId',
       body: {
-        'chat_id': chatId,
-        'operator_id': operatorId,
+        'user_id': operatorId,
       },
     );
 
@@ -130,6 +126,8 @@ class RequestHandler {
       print('Error setting chat status: ${response.body}');
       return;
     }
+
+    print('Chat operator ID set');
   }
 
   static Future<void> setChatStatus(int chatId, int status) async {
