@@ -4,12 +4,14 @@ class MyColors {
   static bool isDarkMode = false;
 
   static late Color textColor;
+  static late Color disabledTextColor;
   static late Color dropdownColor;
   static late Color dropdownContentColor;
   static late Color backgroundColor;
   static late Color dividerColor;
   static late Color buttonTextColor;
   static late Color buttonColor;
+  static late Color disabledButtonColor;
   static late Color chatInputColor;
   static late Color startChatButtonColor;
   static late Color textFieldFillColor;
@@ -31,11 +33,13 @@ class MyColors {
     "divider": Color.fromARGB(255, 158, 158, 158),
     "buttonText": Color.fromARGB(255, 255, 255, 255),
     "button": Color.fromARGB(255, 180, 73, 73),
+    "disabledButton": Color.fromARGB(255, 211, 211, 211),
     "chatInput": Color.fromARGB(255, 28, 28, 36),
     "startChatButtonColor": Color.fromARGB(255, 12, 192, 224),
     "textFieldFill": Color.fromARGB(255, 238, 238, 238),
     "textFieldHint": Color.fromARGB(255, 158, 158, 158),
     "text": Color.fromARGB(255, 236, 236, 236),
+    "disabledText": Color.fromARGB(255, 158, 158, 158),
     "chatBubbleRight": Color.fromARGB(255, 0, 76, 138),
     "chatBubbleLeft": Color.fromARGB(255, 8, 156, 214),
     "logo": Color.fromARGB(255, 4, 133, 0),
@@ -52,9 +56,11 @@ class MyColors {
     "dropdown": Color.fromARGB(255, 85, 85, 85),
     "dropdownContent": Color.fromARGB(255, 100, 100, 100),
     "text": Color.fromARGB(255, 255, 255, 255),
+    "disabledText": Color.fromARGB(255, 158, 158, 158),
     "divider": Color.fromARGB(255, 255, 255, 255),
     "buttonText": Color.fromARGB(255, 0, 0, 0),
     "button": Color.fromARGB(255, 255, 255, 255),
+    "disabledButton": Color.fromARGB(255, 90, 90, 90),
     "chatInput": Color.fromARGB(255, 28, 34, 28),
     "startChatButtonColor": Color.fromARGB(255, 0, 153, 180),
     "textFieldFill": Color.fromARGB(255, 112, 112, 112),
@@ -74,12 +80,14 @@ class MyColors {
     Map<String, Color> colors = isDarkMode ? darkColors : lightColors;
 
     MyColors.textColor = colors["text"]!;
+    MyColors.disabledTextColor = colors["disabledText"]!;
     MyColors.dropdownColor = colors["dropdown"]!;
     MyColors.dropdownContentColor = colors["dropdownContent"]!;
     MyColors.backgroundColor = colors["background"]!;
     MyColors.dividerColor = colors["divider"]!;
     MyColors.buttonTextColor = colors["buttonText"]!;
     MyColors.buttonColor = colors["button"]!;
+    MyColors.disabledButtonColor = colors["disabledButton"]!;
     MyColors.chatInputColor = colors["chatInput"]!;
     MyColors.startChatButtonColor = colors["startChatButtonColor"]!;
     MyColors.textFieldFillColor = colors["textFieldFill"]!;

@@ -1,6 +1,7 @@
 import 'package:ViacAkoNick/common/global_variables.dart';
 import 'package:ViacAkoNick/common/my_colors.dart';
 import 'package:ViacAkoNick/components/operators_list.dart';
+import 'package:ViacAkoNick/models/operator.dart';
 import 'package:ViacAkoNick/screens/chat_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,16 @@ class RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _startChat() {
+    if (GlobalVariables.onlineOperators.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Momentálne nie je dostupný žiadny operátor. Skúste to neskôr.'),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -85,13 +96,7 @@ class RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 16.0),
 
-            // List of active users
-            const Text(
-              'Vyber si konzultanta:',
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
-
-            const OperatorsList(),
+            OperatorsList(),
             const SizedBox(height: 16.0),
 
             // Information message with links
@@ -187,7 +192,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                     WidgetStateProperty.all(MyColors.buttonTextColor),
               ),
               child: const Text('Začať chat'),
-            ),
+            )
           ],
         ),
       ),

@@ -62,10 +62,17 @@ class ServerRequester {
           );
           break;
         case 'POST':
-          response = await http.post(
+          response = await http
+              .post(
             Uri.parse(fullRoute),
             headers: headers,
             body: body,
+          )
+              .timeout(
+            const Duration(seconds: 3),
+            onTimeout: () {
+              throw 'Server is not responding';
+            },
           );
           break;
         case 'PUT':

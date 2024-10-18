@@ -3,6 +3,8 @@ import 'package:ViacAkoNick/common/server_handling/request_handler.dart';
 import 'package:ViacAkoNick/models/operator.dart';
 import 'package:flutter/material.dart';
 
+// add callback function from the parent
+
 class OperatorsList extends StatefulWidget {
   const OperatorsList({super.key});
 
@@ -26,11 +28,20 @@ class _OperatorsListState extends State<OperatorsList> {
       child: FutureBuilder<List<Operator>>(
         future: futureOperators,
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
+          if (snapshot.hasError ||
+              snapshot.data == null ||
+              snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('Momentálne nie je dostupný žiadny operátor.'),
+              child: Text(
+                'Momentálne nie je dostupný žiadny operátor. Skúste to neskôr.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20.0,
+                ),
+              ),
             );
           } else if (snapshot.hasData) {
+            GlobalVariables.onlineOperators = snapshot.data!;
             return OperatorsListComponent(operators: snapshot.data!);
           } else {
             return const Center(
@@ -58,6 +69,10 @@ class _OperatorsListComponentState extends State<OperatorsListComponent> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.operators.isEmpty) {
+      return;
+    }
 
     GlobalVariables.operatorId = widget.operators[0].id;
     GlobalVariables.operatorName =

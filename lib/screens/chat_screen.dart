@@ -15,9 +15,9 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:ViacAkoNick/models/chat.dart' as chat_model;
 import 'package:ViacAkoNick/models/message.dart' as message_model;
 
-// import 'package:file_picker/file_picker.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:open_filex/open_filex.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:open_filex/open_filex.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -374,7 +374,7 @@ class _ChatScreenState extends State<ChatScreen>
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  // _handleImageSelection(); TODO:
+                  _handleImageSelection();
                 },
                 child: const Align(
                   alignment: AlignmentDirectional.centerStart,
@@ -384,7 +384,7 @@ class _ChatScreenState extends State<ChatScreen>
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  // _handleFileSelection(); TODO:
+                  _handleFileSelection();
                 },
                 child: const Align(
                   alignment: AlignmentDirectional.centerStart,
@@ -411,54 +411,54 @@ class _ChatScreenState extends State<ChatScreen>
     return base64UrlEncode(values);
   }
 
-  // void _handleFileSelection() async {
-  //   final result = await FilePicker.platform.pickFiles(
-  //     type: FileType.any,
-  //   );
+  void _handleFileSelection() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+    );
 
-  //   if (result != null && result.files.single.path != null) {
-  //     final message = types.FileMessage(
-  //       author: _user,
-  //       createdAt: DateTime.now().millisecondsSinceEpoch,
-  //       id: randomString(),
-  //       name: result.files.single.name,
-  //       size: result.files.single.size,
-  //       uri: result.files.single.path!,
-  //     );
+    if (result != null && result.files.single.path != null) {
+      final message = types.FileMessage(
+        author: _user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: randomString(),
+        name: result.files.single.name,
+        size: result.files.single.size,
+        uri: result.files.single.path!,
+      );
 
-  //     print('HandleFileSelection: ');
-  //     print(message);
-  //     // _addMessage(message);
-  //   }
-  // }
+      print('HandleFileSelection: ');
+      print(message);
+      // _addMessage(message);
+    }
+  }
 
-  // void _handleImageSelection() async {
-  //   final result = await ImagePicker().pickImage(
-  //     imageQuality: 70,
-  //     maxWidth: 1440,
-  //     source: ImageSource.gallery,
-  //   );
+  void _handleImageSelection() async {
+    final result = await ImagePicker().pickImage(
+      imageQuality: 70,
+      maxWidth: 1440,
+      source: ImageSource.gallery,
+    );
 
-  //   if (result != null) {
-  //     final bytes = await result.readAsBytes();
-  //     final image = await decodeImageFromList(bytes);
+    if (result != null) {
+      final bytes = await result.readAsBytes();
+      final image = await decodeImageFromList(bytes);
 
-  //     final message = types.ImageMessage(
-  //       author: _user,
-  //       createdAt: DateTime.now().millisecondsSinceEpoch,
-  //       height: image.height.toDouble(),
-  //       id: randomString(),
-  //       name: result.name,
-  //       size: bytes.length,
-  //       uri: result.path,
-  //       width: image.width.toDouble(),
-  //     );
+      final message = types.ImageMessage(
+        author: _user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        height: image.height.toDouble(),
+        id: randomString(),
+        name: result.name,
+        size: bytes.length,
+        uri: result.path,
+        width: image.width.toDouble(),
+      );
 
-  //     print('HandleImageSelection: ');
-  //     print(message);
-  //     // _addMessage(message);
-  //   }
-  // }
+      print('HandleImageSelection: ');
+      print(message);
+      // _addMessage(message);
+    }
+  }
 
   Future<void> _addMessage(
       types.TextMessage message, int chatId, String msg) async {
