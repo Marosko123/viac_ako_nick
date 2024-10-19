@@ -13,6 +13,7 @@ class ApiRoutes {
   static final ApiRoutes addMsgUser = ApiRoutes('addmsguser', 'POST');
   static final ApiRoutes deleteChat = ApiRoutes('chat', 'DELETE');
   static final ApiRoutes setChatStatus = ApiRoutes('setchatstatus', 'POST');
+  static final ApiRoutes sendFile = ApiRoutes('file', 'POST');
 
   final String path;
   final String method;

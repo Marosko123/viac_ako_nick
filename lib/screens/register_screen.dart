@@ -1,7 +1,6 @@
 import 'package:ViacAkoNick/common/global_variables.dart';
 import 'package:ViacAkoNick/common/my_colors.dart';
 import 'package:ViacAkoNick/components/operators_list.dart';
-import 'package:ViacAkoNick/models/operator.dart';
 import 'package:ViacAkoNick/screens/chat_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

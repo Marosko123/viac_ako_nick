@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:ViacAkoNick/common/global_variables.dart';
@@ -17,7 +18,6 @@ import 'package:ViacAkoNick/models/message.dart' as message_model;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:open_filex/open_filex.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -30,9 +30,10 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen>
     with SingleTickerProviderStateMixin {
   late Future<chat_model.Chat?> futureChatRoom;
-  final List<types.TextMessage> _messages = [];
-  final _user = const types.User(id: '1');
+  final List<types.Message> _messages = [];
   Timer? _timer;
+
+  final types.User _user = const types.User(id: '0');
 
   bool _showQuickMessages = false;
   late AnimationController _animationController;
@@ -197,7 +198,7 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
                 if (GlobalVariables.operatorName.isNotEmpty)
                   Text(
-                    "Operátor ${GlobalVariables.operatorName}",
+                    "Chatuješ s: ${GlobalVariables.operatorName}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -221,18 +222,18 @@ class _ChatScreenState extends State<ChatScreen>
                           children: [
                             Chat(
                               messages: _messages,
-                              showUserAvatars: true,
+                              // showUserAvatars: true,
                               onAttachmentPressed: _handleAttachmentPressed,
                               onSendPressed: _handleSendPressed,
-                              user: const types.User(id: '0'),
+                              user: _user,
                               bubbleBuilder: (child,
                                       {required message,
                                       required nextMessageInGroup}) =>
                                   _bubbleBuilder(
                                 child,
-                                message: message as types.TextMessage,
+                                message: message,
                                 nextMessageInGroup: nextMessageInGroup,
-                                user: const types.User(id: '0'),
+                                user: _user,
                               ),
                             ),
                             // Quick Messages Container
@@ -350,6 +351,7 @@ class _ChatScreenState extends State<ChatScreen>
                     foregroundColor: MyColors.textColor,
                     heroTag: 'mainFab',
                     onPressed: _toggleFab,
+                    elevation: 0,
                     child: AnimatedIcon(
                       icon: AnimatedIcons.menu_close,
                       progress: _animation,
@@ -426,9 +428,10 @@ class _ChatScreenState extends State<ChatScreen>
         uri: result.files.single.path!,
       );
 
-      print('HandleFileSelection: ');
-      print(message);
-      // _addMessage(message);
+      File file = File(result.files.single.path!);
+      await RequestHandler.handleFileUpload(file, GlobalVariables.chatId);
+
+      _addFile(message);
     }
   }
 
@@ -454,14 +457,21 @@ class _ChatScreenState extends State<ChatScreen>
         width: image.width.toDouble(),
       );
 
-      print('HandleImageSelection: ');
-      print(message);
-      // _addMessage(message);
+      File file = File(result.path!);
+      await RequestHandler.handleFileUpload(file, GlobalVariables.chatId);
+
+      _addFile(message);
     }
   }
 
+  Future<void> _addFile(types.Message message) async {
+    setState(() {
+      _messages.insert(0, message);
+    });
+  }
+
   Future<void> _addMessage(
-      types.TextMessage message, int chatId, String msg) async {
+      types.Message message, int chatId, String msg) async {
     try {
       _messages.insert(0, message);
       setState(() {});
@@ -472,21 +482,15 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
-  // Add a quick message to the chat
-  void _sendQuickMessage(String text) async {
-    final quickMessage = types.TextMessage(
-      author: const types.User(id: '0'),
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: Random().nextDouble().toString(),
+  Future<void> _sendQuickMessage(String text) async {
+    await _handleSendPressed(types.PartialText(
       text: text,
-    );
-
-    await _addMessage(quickMessage, GlobalVariables.chatId, text);
+    ));
   }
 
-  void _handleSendPressed(types.PartialText message) async {
+  Future<void> _handleSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
-      author: const types.User(id: '0'),
+      author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: Random().nextDouble().toString(),
       text: message.text,
@@ -498,12 +502,22 @@ class _ChatScreenState extends State<ChatScreen>
 
 Widget _bubbleBuilder(
   Widget child, {
-  required types.TextMessage message,
+  required types.Message message,
   required bool nextMessageInGroup,
   required types.User user,
 }) {
   // Determine if the message should be on the right or left based on message.userId
   bool isCurrentUser = message.author.id == '0';
+
+  var fileUrl = '';
+
+  if (message.type == types.MessageType.text) {
+    var messageText = message as types.TextMessage;
+
+    if (messageText.text.contains('http')) {
+      fileUrl = messageText.text;
+    }
+  }
 
   return Align(
     alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -519,11 +533,37 @@ Widget _bubbleBuilder(
           : isCurrentUser
               ? BubbleNip.rightBottom
               : BubbleNip.leftBottom,
-      child: DefaultTextStyle(
-        style: TextStyle(color: MyColors.textColor),
-        child: child,
-      ),
+      child: fileUrl.isNotEmpty
+          ? _buildFilePreview(fileUrl)
+          : DefaultTextStyle(
+              style: TextStyle(color: MyColors.textColor),
+              child: child,
+            ),
     ),
+  );
+}
+
+Widget _buildFilePreview(String fileUrl) {
+  return Image.network(
+    fileUrl,
+    loadingBuilder:
+        (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+      if (loadingProgress == null) {
+        return child;
+      } else {
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    (loadingProgress.expectedTotalBytes ?? 1)
+                : null,
+          ),
+        );
+      }
+    },
+    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+      return const Text('Failed to load image');
+    },
   );
 }
 

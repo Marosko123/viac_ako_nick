@@ -1,5 +1,8 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:ViacAkoNick/common/global_variables.dart';
 import 'package:ViacAkoNick/common/server_handling/parsers.dart';
 import 'package:ViacAkoNick/common/server_handling/routes.dart';
@@ -57,7 +60,7 @@ class RequestHandler {
   static Future<FetchChatMessages> fetchChatMessages() async {
     final http.Response response = await ServerRequester.request(
       apiRoute: ApiRoutes.fetchChatMessages,
-      params: '?chat_id=${GlobalVariables.chatId}',
+      params: '?chat_id=${GlobalVariables.chatId}&file_as_link=true',
     );
 
     if (!isOk(response.statusCode)) {
@@ -154,5 +157,52 @@ class RequestHandler {
     await setChatStatus(chatId, 2);
   }
 
-  // TODO: prilohy
+  static Future<bool> handleFileUpload(File file, int chatId) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://viacakonick-chat.hexatech.sk/index.php/restapi/file'),
+      );
+
+      var multipart = await http.MultipartFile.fromPath('files', file.path);
+
+      request.files.add(multipart);
+      request.fields['persistent'] = 'true';
+      request.fields['chat_id'] = chatId.toString();
+
+      String basicAuth =
+          'Basic ${base64Encode(utf8.encode('RestAPI1:hexatech2024*'))}';
+
+      request.headers['Authorization'] = basicAuth;
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // Convert the streamed response into JSON
+        var responseBody = await http.Response.fromStream(response);
+        var result = jsonDecode(responseBody.body);
+
+        // Handle the response
+        if (result['id'] != null && result['security_hash'] != null) {
+          String fileAttachmentCode =
+              '[file=${result['id']}_${result['security_hash']}]';
+          print('File Uploaded');
+          print(fileAttachmentCode);
+          await RequestHandler.addMsgUser(chatId, fileAttachmentCode);
+
+          return true;
+        } else {
+          print('File upload failed');
+          return false;
+        }
+      } else {
+        print('Error: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error uploading file: $e');
+      return false;
+    }
+  }
 }
