@@ -106,9 +106,11 @@ class _ChatScreenState extends State<ChatScreen>
     });
   }
 
-  bool hasNewMessage(List<message_model.Message> fetchedMessages,
-      List<types.Message> messages2) {
-    return fetchedMessages.length > messages2.length;
+  bool messageExists(
+      message_model.Message message, List<types.Message> fetchedMessages) {
+    var hasSameId = fetchedMessages.any((m) => m.id == message.id.toString());
+
+    return hasSameId;
   }
 
   Future<void> _fetchMessages() async {
@@ -128,24 +130,34 @@ class _ChatScreenState extends State<ChatScreen>
 
     try {
       var result = await RequestHandler.fetchChatMessages();
-      var messages = result.messages;
+      var fetchedMessages = result.messages;
 
-      // If there are new messages, update the chat
-      if (messages.isNotEmpty && hasNewMessage(messages, _messages)) {
-        _messages.clear();
+      if (fetchedMessages.isEmpty) {
+        return;
+      }
 
-        for (var message in messages) {
+      for (var message in fetchedMessages) {
+        // Skip your messages
+        if (message.userId == 0 && _messages.isNotEmpty) {
+          continue;
+        }
+
+        // Check if the message is already in the _messages list (based on its ID)
+        bool isMessageExists = messageExists(message, _messages);
+
+        if (!isMessageExists) {
+          // If the message is new, add it to the list
           final textMessage = types.TextMessage(
             author: types.User(id: message.userId.toString()),
             createdAt: DateTime.now().millisecondsSinceEpoch,
-            id: Random().nextDouble().toString(),
+            id: message.id.toString(),
             text: message.msg,
           );
-          _messages.insert(0, textMessage);
-        }
 
-        // Refresh the UI
-        setState(() {});
+          setState(() {
+            _messages.insert(0, textMessage); // Add new messages
+          });
+        }
       }
     } catch (e) {
       print('Error fetching messages: $e');
@@ -176,6 +188,11 @@ class _ChatScreenState extends State<ChatScreen>
 
   // New method to toggle the FAB dropdown
   void _toggleFab() {
+    // disable dropdown while loading chat
+    if (GlobalVariables.chatId == -1) {
+      return;
+    }
+
     setState(() {
       _isFabOpen = !_isFabOpen;
       if (_isFabOpen) {

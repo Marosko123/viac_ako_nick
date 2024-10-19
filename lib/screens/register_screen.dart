@@ -49,14 +49,9 @@ class RegisterScreenState extends State<RegisterScreen> {
         return;
       }
 
-      // GlobalVariables.operatorId =
       GlobalVariables.user.name = _userName!;
       GlobalVariables.question = _question!;
       GlobalVariables.phone = _phoneNumber ?? '';
-
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Začínam chat s $_userName')),
-      // );
 
       Navigator.of(context).pushNamed(ChatScreen.routeName);
     }
